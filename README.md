@@ -1,10 +1,13 @@
 #svrkit-tt
 
-## 1.thrift
+## 1.自动生产
 
-namespace app.xxx.thf
+先创建service目录,假设服务名为account,则目录为app.account
 
-thrift -r -out . --gen py:tornado app/account/account.thrift
+````
+$cd svrkit-tt
+$python svrkit/autogen.py account
+````
 
 ## 2.运行
 

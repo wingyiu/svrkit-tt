@@ -3,10 +3,11 @@
 import time
 
 from app.account.thf.ttypes import Account
+from app.account.thf import AccountService
 from svrkit.service import BaseHandler
 
 
-class AccountHandler(BaseHandler):
+class AccountHandler(BaseHandler, AccountService.Iface):
     def __init__(self):
         super(AccountHandler, self).__init__()
 

@@ -69,25 +69,26 @@ class BaseClient(object):
 
         # ping
         to_call = getattr(client, method)
-        res = yield to_call(*args, **kwargs)
+        res = yield to_call(seq_id, *args, **kwargs)
 
         # close the transport
         client._transport.close()
         raise gen.Return(res)
 
-    @gen.coroutine
-    def __call__(self, method, *args, **kwargs):
-        if 'seq_id' in kwargs:
-            seq_id = kwargs['seq_id']
-        else:
-            seq_id = args[0]
-        res = yield self._remote_call(method, seq_id, *args, **kwargs)
-        raise gen.Return(res)
-
-    def __getattr__(self, method):
-        # 返回一个闭包,该闭包封装了self和method.
-        # 当这个闭包被执行时,即x(*args, **kwargs),
-        # 即self(method, *args, **kargs)被运行,
-        # 即self.__call__(self, method, *args, **kwargs)
-        f = lambda *args, **kwargs: self(method, *args, **kwargs)
-        return f
+    # @gen.coroutine
+    # def __call__(self, method, *args, **kwargs):
+    #     if 'seq_id' in kwargs:
+    #         seq_id = kwargs.pop('seq_id')
+    #     else:
+    #         seq_id = args[0]
+    #         args = args[1:]
+    #     res = yield self._remote_call(method, seq_id, *args, **kwargs)
+    #     raise gen.Return(res)
+    #
+    # def __getattr__(self, method):
+    #     # 返回一个闭包,该闭包封装了self和method.
+    #     # 当这个闭包被执行时,即x(*args, **kwargs),
+    #     # 即self(method, *args, **kargs)被运行,
+    #     # 即self.__call__(self, method, *args, **kwargs)
+    #     f = lambda *args, **kwargs: self(method, *args, **kwargs)
+    #     return f

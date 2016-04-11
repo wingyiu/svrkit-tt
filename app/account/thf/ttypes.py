@@ -40,6 +40,8 @@ class Account:
    - phone
    - created_at
    - updated_at
+   - last_login
+   - status
   """
 
   thrift_spec = (
@@ -50,15 +52,19 @@ class Account:
     (4, TType.STRING, 'phone', None, None, ), # 4
     (5, TType.I32, 'created_at', None, None, ), # 5
     (6, TType.I32, 'updated_at', None, None, ), # 6
+    (7, TType.I32, 'last_login', None, None, ), # 7
+    (8, TType.I32, 'status', None, None, ), # 8
   )
 
-  def __init__(self, account_id=thrift_spec[1][4], handle=None, email=None, phone=None, created_at=None, updated_at=None,):
+  def __init__(self, account_id=thrift_spec[1][4], handle=None, email=None, phone=None, created_at=None, updated_at=None, last_login=None, status=None,):
     self.account_id = account_id
     self.handle = handle
     self.email = email
     self.phone = phone
     self.created_at = created_at
     self.updated_at = updated_at
+    self.last_login = last_login
+    self.status = status
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -99,6 +105,16 @@ class Account:
           self.updated_at = iprot.readI32()
         else:
           iprot.skip(ftype)
+      elif fid == 7:
+        if ftype == TType.I32:
+          self.last_login = iprot.readI32()
+        else:
+          iprot.skip(ftype)
+      elif fid == 8:
+        if ftype == TType.I32:
+          self.status = iprot.readI32()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -133,6 +149,14 @@ class Account:
       oprot.writeFieldBegin('updated_at', TType.I32, 6)
       oprot.writeI32(self.updated_at)
       oprot.writeFieldEnd()
+    if self.last_login is not None:
+      oprot.writeFieldBegin('last_login', TType.I32, 7)
+      oprot.writeI32(self.last_login)
+      oprot.writeFieldEnd()
+    if self.status is not None:
+      oprot.writeFieldBegin('status', TType.I32, 8)
+      oprot.writeI32(self.status)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -148,6 +172,8 @@ class Account:
     value = (value * 31) ^ hash(self.phone)
     value = (value * 31) ^ hash(self.created_at)
     value = (value * 31) ^ hash(self.updated_at)
+    value = (value * 31) ^ hash(self.last_login)
+    value = (value * 31) ^ hash(self.status)
     return value
 
   def __repr__(self):

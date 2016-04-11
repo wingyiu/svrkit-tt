@@ -9,7 +9,13 @@ $cd svrkit-tt
 $python svrkit/autogen.py account
 ````
 
-## 2.运行
+## 2.更新thf后
+
+````
+$python svrkit/update_thf.py account
+````
+
+## 3.运行
 
 服务端
 `python app/account/test/server.py --port=8080`

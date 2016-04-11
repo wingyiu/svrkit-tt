@@ -11,8 +11,9 @@ from app.account.client import AccountClient
 @gen.coroutine
 def test():
     client = AccountClient('/Users/user/Git/svrkit-tt/app/account/test/client.ini')
-    bk = yield client.ping(1, 'o')
-    print(bk)
+    for i in range(100):
+        bk = yield client.ping(i, str(i))
+        print(bk)
     raise gen.Return()
 
 

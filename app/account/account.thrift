@@ -14,6 +14,8 @@ struct Account {
 	4: optional string phone,
 	5: optional i32 created_at,
 	6: optional i32 updated_at,
+	7: optional i32 last_login,
+	8: optional i32 status
 }
 
 exception AccountException {

@@ -16,7 +16,7 @@ except:
   fastbinary = None
 
 
-class Status:
+class AccountStatus:
   Normal = 0
   BAN = 1
 
@@ -31,11 +31,102 @@ class Status:
   }
 
 
+class AccountHandle:
+  """
+  Attributes:
+   - username
+   - email
+   - phone
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRING, 'username', None, None, ), # 1
+    (2, TType.STRING, 'email', None, None, ), # 2
+    (3, TType.STRING, 'phone', None, None, ), # 3
+  )
+
+  def __init__(self, username=None, email=None, phone=None,):
+    self.username = username
+    self.email = email
+    self.phone = phone
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRING:
+          self.username = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRING:
+          self.email = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 3:
+        if ftype == TType.STRING:
+          self.phone = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('AccountHandle')
+    if self.username is not None:
+      oprot.writeFieldBegin('username', TType.STRING, 1)
+      oprot.writeString(self.username)
+      oprot.writeFieldEnd()
+    if self.email is not None:
+      oprot.writeFieldBegin('email', TType.STRING, 2)
+      oprot.writeString(self.email)
+      oprot.writeFieldEnd()
+    if self.phone is not None:
+      oprot.writeFieldBegin('phone', TType.STRING, 3)
+      oprot.writeString(self.phone)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __hash__(self):
+    value = 17
+    value = (value * 31) ^ hash(self.username)
+    value = (value * 31) ^ hash(self.email)
+    value = (value * 31) ^ hash(self.phone)
+    return value
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
 class Account:
   """
   Attributes:
    - account_id
-   - handle
+   - username
    - email
    - phone
    - created_at
@@ -47,7 +138,7 @@ class Account:
   thrift_spec = (
     None, # 0
     (1, TType.I32, 'account_id', None, 0, ), # 1
-    (2, TType.STRING, 'handle', None, None, ), # 2
+    (2, TType.STRING, 'username', None, None, ), # 2
     (3, TType.STRING, 'email', None, None, ), # 3
     (4, TType.STRING, 'phone', None, None, ), # 4
     (5, TType.I32, 'created_at', None, None, ), # 5
@@ -56,9 +147,9 @@ class Account:
     (8, TType.I32, 'status', None, None, ), # 8
   )
 
-  def __init__(self, account_id=thrift_spec[1][4], handle=None, email=None, phone=None, created_at=None, updated_at=None, last_login=None, status=None,):
+  def __init__(self, account_id=thrift_spec[1][4], username=None, email=None, phone=None, created_at=None, updated_at=None, last_login=None, status=None,):
     self.account_id = account_id
-    self.handle = handle
+    self.username = username
     self.email = email
     self.phone = phone
     self.created_at = created_at
@@ -82,7 +173,7 @@ class Account:
           iprot.skip(ftype)
       elif fid == 2:
         if ftype == TType.STRING:
-          self.handle = iprot.readString()
+          self.username = iprot.readString()
         else:
           iprot.skip(ftype)
       elif fid == 3:
@@ -129,9 +220,9 @@ class Account:
       oprot.writeFieldBegin('account_id', TType.I32, 1)
       oprot.writeI32(self.account_id)
       oprot.writeFieldEnd()
-    if self.handle is not None:
-      oprot.writeFieldBegin('handle', TType.STRING, 2)
-      oprot.writeString(self.handle)
+    if self.username is not None:
+      oprot.writeFieldBegin('username', TType.STRING, 2)
+      oprot.writeString(self.username)
       oprot.writeFieldEnd()
     if self.email is not None:
       oprot.writeFieldBegin('email', TType.STRING, 3)
@@ -167,7 +258,7 @@ class Account:
   def __hash__(self):
     value = 17
     value = (value * 31) ^ hash(self.account_id)
-    value = (value * 31) ^ hash(self.handle)
+    value = (value * 31) ^ hash(self.username)
     value = (value * 31) ^ hash(self.email)
     value = (value * 31) ^ hash(self.phone)
     value = (value * 31) ^ hash(self.created_at)
@@ -187,7 +278,7 @@ class Account:
   def __ne__(self, other):
     return not (self == other)
 
-class AccountException(TException):
+class AccountExisted(TException):
 
   thrift_spec = (
   )
@@ -210,7 +301,7 @@ class AccountException(TException):
     if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
-    oprot.writeStructBegin('AccountException')
+    oprot.writeStructBegin('AccountExisted')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 

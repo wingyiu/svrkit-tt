@@ -1,19 +1,24 @@
 # -*- coding: utf-8 -*-
-
-from thrift import TTornado
-from thrift.protocol import TBinaryProtocol
-from thrift.transport import TTransport
+import os
+import sys
 from tornado import gen
 from tornado import ioloop
 
-from app.account.client import AccountClient
+from app.account.client import AccountClient, account_ttypes, account_constants
 
 @gen.coroutine
 def test():
-    client = AccountClient('/Users/user/Git/svrkit-tt/app/account/test/client.ini')
-    for i in range(100):
-        bk = yield client.ping(i, str(i))
-        print(bk)
+    conf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'client.ini')
+    client = AccountClient(conf_path)
+    res = yield client.ping(1, 'o')
+    print(res)
+
+    handle = account_ttypes.AccountHandle(username='wingyiu')
+    try:
+        res = yield client.reg(1, handle, '123456')
+    except:
+        print(sys.exc_info()[0])
+    print(res)
     raise gen.Return()
 
 

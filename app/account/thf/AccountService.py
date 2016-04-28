@@ -162,6 +162,8 @@ class Client(Iface):
     iprot.readMessageEnd()
     if result.success is not None:
       return result.success
+    if result.e is not None:
+      raise result.e
     raise TApplicationException(TApplicationException.MISSING_RESULT, "reg failed: unknown result")
 
   def login(self, seq_id, handle, password):
@@ -280,7 +282,10 @@ class Processor(Iface, TProcessor):
     args.read(iprot)
     iprot.readMessageEnd()
     result = reg_result()
-    result.success = yield gen.maybe_future(self._handler.reg(args.seq_id, args.handle, args.password))
+    try:
+      result.success = yield gen.maybe_future(self._handler.reg(args.seq_id, args.handle, args.password))
+    except AccountExisted as e:
+      result.e = e
     oprot.writeMessageBegin("reg", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
@@ -466,7 +471,7 @@ class reg_args:
   thrift_spec = (
     None, # 0
     (1, TType.I32, 'seq_id', None, None, ), # 1
-    (2, TType.STRING, 'handle', None, None, ), # 2
+    (2, TType.STRUCT, 'handle', (AccountHandle, AccountHandle.thrift_spec), None, ), # 2
     (3, TType.STRING, 'password', None, None, ), # 3
   )
 
@@ -490,8 +495,9 @@ class reg_args:
         else:
           iprot.skip(ftype)
       elif fid == 2:
-        if ftype == TType.STRING:
-          self.handle = iprot.readString()
+        if ftype == TType.STRUCT:
+          self.handle = AccountHandle()
+          self.handle.read(iprot)
         else:
           iprot.skip(ftype)
       elif fid == 3:
@@ -514,8 +520,8 @@ class reg_args:
       oprot.writeI32(self.seq_id)
       oprot.writeFieldEnd()
     if self.handle is not None:
-      oprot.writeFieldBegin('handle', TType.STRING, 2)
-      oprot.writeString(self.handle)
+      oprot.writeFieldBegin('handle', TType.STRUCT, 2)
+      self.handle.write(oprot)
       oprot.writeFieldEnd()
     if self.password is not None:
       oprot.writeFieldBegin('password', TType.STRING, 3)
@@ -550,14 +556,17 @@ class reg_result:
   """
   Attributes:
    - success
+   - e
   """
 
   thrift_spec = (
     (0, TType.STRUCT, 'success', (Account, Account.thrift_spec), None, ), # 0
+    (1, TType.STRUCT, 'e', (AccountExisted, AccountExisted.thrift_spec), None, ), # 1
   )
 
-  def __init__(self, success=None,):
+  def __init__(self, success=None, e=None,):
     self.success = success
+    self.e = e
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -574,6 +583,12 @@ class reg_result:
           self.success.read(iprot)
         else:
           iprot.skip(ftype)
+      elif fid == 1:
+        if ftype == TType.STRUCT:
+          self.e = AccountExisted()
+          self.e.read(iprot)
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -588,6 +603,10 @@ class reg_result:
       oprot.writeFieldBegin('success', TType.STRUCT, 0)
       self.success.write(oprot)
       oprot.writeFieldEnd()
+    if self.e is not None:
+      oprot.writeFieldBegin('e', TType.STRUCT, 1)
+      self.e.write(oprot)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -598,6 +617,7 @@ class reg_result:
   def __hash__(self):
     value = 17
     value = (value * 31) ^ hash(self.success)
+    value = (value * 31) ^ hash(self.e)
     return value
 
   def __repr__(self):
@@ -622,7 +642,7 @@ class login_args:
   thrift_spec = (
     None, # 0
     (1, TType.I32, 'seq_id', None, None, ), # 1
-    (2, TType.STRING, 'handle', None, None, ), # 2
+    (2, TType.STRUCT, 'handle', (AccountHandle, AccountHandle.thrift_spec), None, ), # 2
     (3, TType.STRING, 'password', None, None, ), # 3
   )
 
@@ -646,8 +666,9 @@ class login_args:
         else:
           iprot.skip(ftype)
       elif fid == 2:
-        if ftype == TType.STRING:
-          self.handle = iprot.readString()
+        if ftype == TType.STRUCT:
+          self.handle = AccountHandle()
+          self.handle.read(iprot)
         else:
           iprot.skip(ftype)
       elif fid == 3:
@@ -670,8 +691,8 @@ class login_args:
       oprot.writeI32(self.seq_id)
       oprot.writeFieldEnd()
     if self.handle is not None:
-      oprot.writeFieldBegin('handle', TType.STRING, 2)
-      oprot.writeString(self.handle)
+      oprot.writeFieldBegin('handle', TType.STRUCT, 2)
+      self.handle.write(oprot)
       oprot.writeFieldEnd()
     if self.password is not None:
       oprot.writeFieldBegin('password', TType.STRING, 3)
@@ -779,7 +800,7 @@ class change_pwd_args:
   thrift_spec = (
     None, # 0
     (1, TType.I32, 'seq_id', None, None, ), # 1
-    (2, TType.STRING, 'handle', None, None, ), # 2
+    (2, TType.STRUCT, 'handle', (AccountHandle, AccountHandle.thrift_spec), None, ), # 2
     (3, TType.STRING, 'password', None, None, ), # 3
     (4, TType.STRING, 'new_password', None, None, ), # 4
   )
@@ -805,8 +826,9 @@ class change_pwd_args:
         else:
           iprot.skip(ftype)
       elif fid == 2:
-        if ftype == TType.STRING:
-          self.handle = iprot.readString()
+        if ftype == TType.STRUCT:
+          self.handle = AccountHandle()
+          self.handle.read(iprot)
         else:
           iprot.skip(ftype)
       elif fid == 3:
@@ -834,8 +856,8 @@ class change_pwd_args:
       oprot.writeI32(self.seq_id)
       oprot.writeFieldEnd()
     if self.handle is not None:
-      oprot.writeFieldBegin('handle', TType.STRING, 2)
-      oprot.writeString(self.handle)
+      oprot.writeFieldBegin('handle', TType.STRUCT, 2)
+      self.handle.write(oprot)
       oprot.writeFieldEnd()
     if self.password is not None:
       oprot.writeFieldBegin('password', TType.STRING, 3)

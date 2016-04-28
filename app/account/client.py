@@ -8,6 +8,8 @@ import logging
 from tornado import gen
 from svrkit.client import BaseClient
 from app.account.thf import AccountService
+from app.account.thf import ttypes as account_ttypes
+from app.account.thf import constants as account_constants
 
 
 class AccountClient(BaseClient, AccountService.Iface):

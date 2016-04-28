@@ -59,7 +59,6 @@ class BaseClient(object):
         # open the transport, bail on error
         try:
             yield transport.open()
-            print('Transport is opened')
         except TTransport.TTransportException as ex:
             logging.error(ex)
             raise gen.Return()

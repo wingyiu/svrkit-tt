@@ -25,9 +25,9 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print('')
   print('Functions:')
   print('  string ping(i32 seq_id, string ball)')
-  print('  Account reg(i32 seq_id, string handle, string password)')
-  print('  Account login(i32 seq_id, string handle, string password)')
-  print('  i32 change_pwd(i32 seq_id, string handle, string password, string new_password)')
+  print('  Account reg(i32 seq_id, AccountHandle handle, string password)')
+  print('  Account login(i32 seq_id, AccountHandle handle, string password)')
+  print('  i32 change_pwd(i32 seq_id, AccountHandle handle, string password, string new_password)')
   print('')
   sys.exit(0)
 
@@ -94,19 +94,19 @@ elif cmd == 'reg':
   if len(args) != 3:
     print('reg requires 3 args')
     sys.exit(1)
-  pp.pprint(client.reg(eval(args[0]),args[1],args[2],))
+  pp.pprint(client.reg(eval(args[0]),eval(args[1]),args[2],))
 
 elif cmd == 'login':
   if len(args) != 3:
     print('login requires 3 args')
     sys.exit(1)
-  pp.pprint(client.login(eval(args[0]),args[1],args[2],))
+  pp.pprint(client.login(eval(args[0]),eval(args[1]),args[2],))
 
 elif cmd == 'change_pwd':
   if len(args) != 4:
     print('change_pwd requires 4 args')
     sys.exit(1)
-  pp.pprint(client.change_pwd(eval(args[0]),args[1],args[2],args[3],))
+  pp.pprint(client.change_pwd(eval(args[0]),eval(args[1]),args[2],args[3],))
 
 else:
   print('Unrecognized method %s' % cmd)
